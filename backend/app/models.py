@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .database import Base
 
@@ -13,9 +13,21 @@ class User(Base):
 
 class Post(Base):
     __tablename__ = "posts"
+
+    # Primary key
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True, nullable=False)
+
+    # Core content fields
+    title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
-    publication_date = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Publication timestamp, timezone-aware UTC
+    publication_date = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+    # Ownership relation
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="posts")

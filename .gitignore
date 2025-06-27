@@ -14,5 +14,5 @@ dist/
 # Logs
 npm-debug.log*
 
-# SQLite database
-/backend/blog.db
+# ignore SQLite files
+*.db
