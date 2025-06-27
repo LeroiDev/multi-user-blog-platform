@@ -1,6 +1,27 @@
 import pytest
 
 @pytest.mark.asyncio
+async def test_posts_endpoints_require_auth(async_client):
+    # No token → create
+    res = await async_client.post(
+        "/posts/",
+        json={"title": "x", "content": "y"}
+    )
+    assert res.status_code == 401
+    
+    # No token → update
+    res = await async_client.put(
+        "/posts/1",
+        json={"title": "x", "content": "y"}
+    )
+    assert res.status_code == 401
+    
+    # No token → delete
+    res = await async_client.delete("/posts/1")
+    assert res.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_posts_crud(async_client):
     # Register & login user1
     res1 = await async_client.post(
