@@ -1,13 +1,11 @@
-from datetime import datetime, timedelta
-from typing import Generator
-
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from ..database import SessionLocal
+from ..deps import get_db
 from ..models import User
 
 # --- JWT & Password Config ---
@@ -30,18 +28,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # --- JWT creation ---
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    # timezone-aware UTC instead of naive utcnow()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-# --- DB dependency ---
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # --- Auth dependency ---
