@@ -1,8 +1,8 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-// import Home from "./pages/Home";
 import Login from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
+import PostList from "./pages/PostListScreen";
 
 function App() {
   return (
@@ -13,9 +13,9 @@ function App() {
         <Link to="/register">Register</Link>
       </nav>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
         <Route path="login" element={<Login />} />
         <Route path="register" element={<RegisterScreen />} />
+        <Route path="/" element={<PostList />} />
       </Routes>
     </BrowserRouter>
   );
