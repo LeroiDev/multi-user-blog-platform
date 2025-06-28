@@ -12,7 +12,7 @@ const schema = z.object({
 });
 type LoginData = z.infer<typeof schema>;
 
-// shape of error response from our FastAPI back-end
+// shape of error response from FastAPI back-end
 interface ErrorResponse {
   detail: string;
 }

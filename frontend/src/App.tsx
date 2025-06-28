@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
-import PostList from "./pages/PostListScreen";
+import PostListScreen from "./pages/PostListScreen";
 
 function App() {
   return (
@@ -13,9 +13,9 @@ function App() {
         <Link to="/register">Register</Link>
       </nav>
       <Routes>
+        <Route path="/" element={<PostListScreen />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<RegisterScreen />} />
-        <Route path="/" element={<PostList />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,6 @@
 // src/pages/PostListScreen.tsx
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api/client";      // your Axios instance
+import { api } from "../api/client"; // your Axios instance
 import { Link } from "react-router-dom";
 
 interface Post {
@@ -12,13 +12,20 @@ interface Post {
 }
 
 export default function PostListScreen() {
-  const { data: posts, isLoading, error } = useQuery<Post[]>({
+  const {
+    data: posts,
+    isLoading,
+    error,
+  } = useQuery<Post[]>({
     queryKey: ["posts"],
-    queryFn: () => api.get("/posts").then(res => res.data)
+    queryFn: () => api.get("/posts").then((res) => res.data),
   });
 
   if (isLoading) return <div>Loading posts…</div>;
   if (error instanceof Error) return <div>Error: {error.message}</div>;
+  if (posts && posts.length === 0) {
+    return <div className="p-4 text-center text-gray-500">No posts yet.</div>;
+  }
 
   return (
     <div className="p-4 grid gap-4 md:grid-cols-2">
