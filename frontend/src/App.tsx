@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
 import PostListScreen from "./pages/PostListScreen";
+import PostDetailScreen from "./pages/PostDetailScreen";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<PostListScreen />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<RegisterScreen />} />
+        <Route path="/posts/:id" element={<PostDetailScreen />} />
       </Routes>
     </BrowserRouter>
   );
