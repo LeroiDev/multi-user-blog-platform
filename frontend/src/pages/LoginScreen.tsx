@@ -57,13 +57,13 @@ export default function LoginScreen() {
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto p-4">
       <h1 className="text-xl mb-4">Login</h1>
       <div className="mb-2">
-        <label>Email</label>
-        <input {...register("email")} className="w-full border p-2" />
+        <label htmlFor="email">Email</label>
+        <input id="email" {...register("email")} className="w-full border p-2" />
         <p className="text-red-600">{errors.email?.message}</p>
       </div>
       <div className="mb-2">
-        <label>Password</label>
-        <input
+        <label htmlFor="password">Password</label>
+        <input id="password" 
           type="password"
           {...register("password")}
           className="w-full border p-2"
