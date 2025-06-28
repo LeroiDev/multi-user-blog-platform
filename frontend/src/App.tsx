@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 // import Home from "./pages/Home";
 import Login from "./pages/LoginScreen";
-// import Register from "./pages/Register";
+import RegisterScreen from "./pages/RegisterScreen";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
       <Routes>
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="login" element={<Login />} />
-        {/* <Route path="register" element={<Register />} /> */}
+        <Route path="register" element={<RegisterScreen />} />
       </Routes>
     </BrowserRouter>
   );
