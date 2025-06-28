@@ -6,6 +6,7 @@ import HomeScreen from "./pages/HomeScreen";
 import PostListScreen from "./pages/PostListScreen";
 import PostDetailScreen from "./pages/PostDetailScreen";
 import CreatePostScreen from "./pages/CreatePostScreen";
+import EditPostScreen from "./pages/EditPostScreen";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/posts" element={<PostListScreen />} />
         <Route path="/posts/new" element={<CreatePostScreen />} />
         <Route path="/posts/:id" element={<PostDetailScreen />} />
+        <Route path="/posts/:id/edit" element={<EditPostScreen />} />
         {/* Authentication routes */}
         <Route path="login" element={<Login />} />
         <Route path="register" element={<RegisterScreen />} />
