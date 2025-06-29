@@ -18,14 +18,12 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    volumes:
-      - ./frontend:/app               # for `npm run dev` live-reload
+      context: ./frontend
+      dockerfile: Dockerfile
+    # volumes:   ← remove this binding!
+    #  - ./frontend:/app
     ports:
       - "5173:5173"
     environment:
-      VITE_API_BASE_URL: "http://backend:8000"
-    depends_on:
-      - backend
-    command: npm run dev              # swap to `serve -s dist` for prod
+      VITE_API_BASE_URL: "http://localhost:8000"
+    command: serve -s dist -l 5173       # swap to `serve -s dist` for prod
