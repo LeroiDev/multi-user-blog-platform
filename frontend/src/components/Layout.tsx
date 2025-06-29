@@ -1,5 +1,6 @@
 import { useLocation, Outlet } from "react-router-dom";
-import { LinkButton } from "./CustomButton";
+import { LinkButton, Button } from "./CustomButton";
+import { useAuthStore } from "../stores/authStore";
 import BackgroundVideo from "./BackgroundVideo";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -8,15 +9,10 @@ import loginVidMp4 from "../assets/videos/loginVid.mp4";
 import postsVidMp4 from "../assets/videos/postsVid.mp4";
 import detailVidMp4 from "../assets/videos/detailVid.mp4";
 
-const navItems = [
-  { to: "/", label: "Home" },
-  { to: "/posts", label: "Posts" },
-  { to: "/login", label: "Login" },
-  { to: "/register", label: "Register" },
-];
-
 export default function Layout() {
   const { pathname } = useLocation();
+  const logout = useAuthStore((s) => s.logout);
+  const isLoggedIn = Boolean(useAuthStore((s) => s.token));
 
   // Map each route to its clip:
   let videoMp4: string;
@@ -44,18 +40,28 @@ export default function Layout() {
               variant="primary"
               className="text-2xl font-heading"
             >
-              Lightning Blog
+              Horizon Haven
             </LinkButton>
-            <nav className="flex space-x-4">
-              {navItems.map((item) => (
-                <LinkButton
-                  key={item.to}
-                  to={item.to}
-                  variant={pathname === item.to ? "primary" : "secondary"}
-                >
-                  {item.label}
-                </LinkButton>
-              ))}
+            <nav className="flex items-center space-x-4">
+              {!isLoggedIn ? (
+                <>
+                  <LinkButton to="/login"   variant={pathname === "/login"   ? "primary" : "secondary"}>Login</LinkButton>
+                  <LinkButton to="/register"variant={pathname === "/register"? "primary" : "secondary"}>Register</LinkButton>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      logout();
+                      // After logout, redirect to login
+                      window.location.href = "/login";
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         </header>
@@ -74,7 +80,7 @@ export default function Layout() {
         </AnimatePresence>
         {/* FOOTER */}
         <footer className="bg-transparent text-center text-sm py-4">
-          © {new Date().getFullYear()} Lightning Blog • All rights reserved
+          © {new Date().getFullYear()} Horizon Haven Blog • All rights reserved
         </footer>
       </div>
     </BackgroundVideo>

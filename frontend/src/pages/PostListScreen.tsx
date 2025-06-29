@@ -14,7 +14,7 @@ interface Post {
 export default function PostListScreen() {
   const { data: posts, isLoading, error } = useQuery<Post[]>({
     queryKey: ["posts"],
-    queryFn: () => api.get("/posts").then((res) => res.data),
+    queryFn: () => api.get("/posts/").then(r => r.data),
   });
 
   return (

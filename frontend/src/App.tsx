@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import HomeScreen from "./pages/HomeScreen";
 import PostListScreen from "./pages/PostListScreen";
@@ -14,24 +15,30 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          {/* “index” renders at “/” */}
+          {/* Public routes */}
           <Route index element={<HomeScreen />} />
-
-          {/* Posts list at “/posts” */}
-          <Route path="posts" element={<PostListScreen />} />
-
-          {/* Create new post */}
-          <Route path="posts/new" element={<CreatePostScreen />} />
-
-          {/* Post detail */}
-          <Route path="posts/:id" element={<PostDetailScreen />} />
-
-          {/* Edit post */}
-          <Route path="posts/:id/edit" element={<EditPostScreen />} />
-
-          {/* Authentication */}
           <Route path="login" element={<LoginScreen />} />
           <Route path="register" element={<RegisterScreen />} />
+          <Route path="posts" element={<PostListScreen />} />
+          <Route path="posts/:id" element={<PostDetailScreen />} />
+
+          {/* Protected routes */}
+          <Route
+            path="posts/new"
+            element={
+              <ProtectedRoute>
+                <CreatePostScreen />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="posts/:id/edit"
+            element={
+              <ProtectedRoute>
+                <EditPostScreen />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

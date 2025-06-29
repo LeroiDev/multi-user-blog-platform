@@ -25,6 +25,7 @@ class PostRead(BaseModel):
     content: str
     publication_date: datetime
     author_email: EmailStr
+    owner_id: int
 
 class Token(BaseModel):
     access_token: str

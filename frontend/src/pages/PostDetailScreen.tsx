@@ -19,6 +19,7 @@ export default function PostDetailScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const token = useAuthStore((s) => s.token);
   const currentUser = useAuthStore((s) => s.user);
 
   const {
@@ -27,7 +28,7 @@ export default function PostDetailScreen() {
     error,
   } = useQuery<Post>({
     queryKey: ["post", id],
-    queryFn: () => api.get(`/posts/${id}`).then((res) => res.data),
+    queryFn: () => api.get(`/posts/${id}`).then(r => r.data),
     enabled: !!id,
   });
 
@@ -51,7 +52,8 @@ export default function PostDetailScreen() {
     return <p className="text-center">Post not found.</p>;
   }
 
-  const isOwner = currentUser?.id === post.owner_id;
+  const isOwner = Boolean(token && currentUser?.id === post.owner_id);
+  console.log(`Post owner ID: ${post.owner_id}, Current user ID: ${currentUser?.id}`);  
 
   return (
     <div className="flex gap-8">

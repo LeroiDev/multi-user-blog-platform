@@ -6,7 +6,7 @@ from .. import models, schemas
 from ..deps import get_db
 from ..auth.security import get_current_user
 
-router = APIRouter(prefix="/posts", tags=["posts"])
+router = APIRouter(prefix="/posts", redirect_slashes=False, tags=["posts"])
 
 @router.post(
     "/", 
@@ -32,6 +32,7 @@ def create_post(
         content=post.content,
         publication_date=post.publication_date,
         author_email=current_user.email,
+        owner_id=post.owner_id,
     )
 
 @router.get("/", response_model=List[schemas.PostRead])
@@ -44,6 +45,7 @@ def read_posts(db: Session = Depends(get_db)):
             content=p.content,
             publication_date=p.publication_date,
             author_email=p.owner.email,
+            owner_id=p.owner_id, 
         )
         for p in posts
     ]
@@ -52,13 +54,14 @@ def read_posts(db: Session = Depends(get_db)):
 def read_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Post not found")
     return schemas.PostRead(
         id=post.id,
         title=post.title,
         content=post.content,
         publication_date=post.publication_date,
         author_email=post.owner.email,
+        owner_id=post.owner_id,  
     )
 
 @router.put("/{post_id}", response_model=schemas.PostRead)
@@ -83,6 +86,7 @@ def update_post(
         content=post.content,
         publication_date=post.publication_date,
         author_email=current_user.email,
+        owner_id=post.owner_id, 
     )
 
 @router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -6,8 +6,8 @@ import classNames from "classnames";
 // Base styles for both Button and LinkButton
 const base =
   "inline-flex items-center justify-center px-5 py-3 rounded-lg font-medium \
-    transform transition duration-200 ease-in-out \
-    focus:outline-none focus:ring-2 focus:ring-offset-2";
+   transform transition duration-200 ease-in-out focus:outline-none \
+    focus:ring-2 focus:ring-offset-2 no-underline";
 
 // Extendable variants
 const variants = {

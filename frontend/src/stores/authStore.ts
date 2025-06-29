@@ -1,34 +1,45 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+import { parseJwt } from "../utils/jwt";
+
 
 interface User {
   id: number;
-  email: string;
-  name?: string;
+  email?: string;
 }
 
 interface AuthState {
   token: string | null;
   user: User | null;
   setToken: (token: string | null) => void;
-  setUser: (user: User | null) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: localStorage.getItem("token"),
-  user: null,
-  setToken: (token) => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
-    set({ token });
-  },
-  setUser: (user) => set({ user }),
-  logout: () => {
-    localStorage.removeItem("token");
-    set({ token: null, user: null });
-  },
-}));
+export const useAuthStore = create<AuthState>((set) => {
+  const savedToken = localStorage.getItem("token");
+  const initialUser = savedToken ? parseJwt(savedToken) : null;
 
-export const getToken = () => {
-  return localStorage.getItem("token");
-};
+  return {
+    token: savedToken,
+    user: initialUser,
+
+    setToken: (token) => {
+      if (token) {
+        localStorage.setItem("token", token);
+        set({ token, user: parseJwt(token) });
+      } else {
+        localStorage.removeItem("token");
+        set({ token: null, user: null });
+      }
+    },
+
+    logout: () => {
+      localStorage.removeItem("token");
+      set({ token: null, user: null });
+    },
+  };
+});
+
+// Helper to pull the token outside React components
+export function getToken() {
+  return useAuthStore.getState().token;
+}
