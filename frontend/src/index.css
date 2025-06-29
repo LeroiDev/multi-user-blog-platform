@@ -63,3 +63,12 @@
   padding-left: 2rem;
   padding-right: 2rem;
 }
+
+.video-wrapper video {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.video-wrapper video.ready {
+  opacity: 1;
+}

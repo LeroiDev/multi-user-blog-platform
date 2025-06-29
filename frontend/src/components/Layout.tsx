@@ -1,5 +1,11 @@
 import { useLocation, Outlet } from "react-router-dom";
 import { LinkButton } from "./CustomButton";
+import BackgroundVideo from "./BackgroundVideo";
+
+import lightningPoster from "../assets/images/lightning_blog.jpg";
+import loginVidMp4 from "../assets/videos/loginVid.mp4";
+import postsVidMp4 from "../assets/videos/postsVid.mp4";
+import detailVidMp4 from "../assets/videos/detailVid.mp4";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -11,41 +17,56 @@ const navItems = [
 export default function Layout() {
   const { pathname } = useLocation();
 
+  // Map each route to its clip:
+  let videoMp4: string;
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+    videoMp4 = loginVidMp4;
+  } else if (pathname === "/posts") {
+    videoMp4 = postsVidMp4;
+  } else if (pathname.match(/^\/posts\/\d+$/) && !pathname.endsWith("/edit")) {
+    videoMp4 = detailVidMp4;
+  } else {
+    // fallback or for /posts/:id/edit
+    videoMp4 = loginVidMp4;
+  }
+
+  console.log("Current path:", pathname, "→ playing:", videoMp4);
+
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-100 text-neutral-900">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-10 bg-neutral-900 text-neutral-100 shadow">
-        <div className="container flex justify-between items-center py-4">
-          <LinkButton
-            to="/"
-            variant="primary"
-            className="font-heading text-2xl px-4 py-2"
-          >
-            Lightning Blog
-          </LinkButton>
-          <nav className="flex space-x-4">
-            {navItems.map((item) => (
-              <LinkButton
-                key={item.to}
-                to={item.to}
-                variant={pathname === item.to ? "primary" : "secondary"}
-                className="py-1 px-3 text-sm"
-              >
-                {item.label}
-              </LinkButton>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      {/* This Outlet is where nested routes will render */}
-      <main className="flex-grow container py-12">
-        <Outlet />
-      </main>
-
-      <footer className="bg-neutral-900 text-neutral-500 text-center py-4">
-        © {new Date().getFullYear()} Lightning Blog • All rights reserved
-      </footer>
-    </div>
+    <BackgroundVideo srcMp4={videoMp4} poster={lightningPoster}>
+      <div className="min-h-screen flex flex-col bg-transparent text-neutral-100">
+        {/* HEADER */}
+        <header className="sticky top-0 z-20 bg-transparent">
+          <div className="container flex justify-between items-center py-4">
+            <LinkButton
+              to="/"
+              variant="primary"
+              className="text-2xl font-heading"
+            >
+              Lightning Blog
+            </LinkButton>
+            <nav className="flex space-x-4">
+              {navItems.map((item) => (
+                <LinkButton
+                  key={item.to}
+                  to={item.to}
+                  variant={pathname === item.to ? "primary" : "secondary"}
+                >
+                  {item.label}
+                </LinkButton>
+              ))}
+            </nav>
+          </div>
+        </header>
+        {/* MAIN CONTENT */}
+        <main className="flex-grow container py-12">
+          <Outlet />
+        </main>
+        {/* FOOTER */}
+        <footer className="bg-transparent text-center text-sm py-4">
+          © {new Date().getFullYear()} Lightning Blog • All rights reserved
+        </footer>
+      </div>
+    </BackgroundVideo>
   );
 }

@@ -1,4 +1,3 @@
-import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 
@@ -14,18 +13,23 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* All routes share the Layout */}
         <Route path="/" element={<Layout />}>
-          {/* The index route renders HomeScreen */}
+          {/* “index” renders at “/” */}
           <Route index element={<HomeScreen />} />
 
-          {/* CRUD routes */}
+          {/* Posts list at “/posts” */}
           <Route path="posts" element={<PostListScreen />} />
+
+          {/* Create new post */}
           <Route path="posts/new" element={<CreatePostScreen />} />
+
+          {/* Post detail */}
           <Route path="posts/:id" element={<PostDetailScreen />} />
+
+          {/* Edit post */}
           <Route path="posts/:id/edit" element={<EditPostScreen />} />
 
-          {/* Auth routes */}
+          {/* Authentication */}
           <Route path="login" element={<LoginScreen />} />
           <Route path="register" element={<RegisterScreen />} />
         </Route>

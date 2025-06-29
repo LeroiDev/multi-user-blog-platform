@@ -3,8 +3,6 @@ import PostCard from "../components/PostCard";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 
-import lightningImg from "../assets/images/lightning_blog.jpg";
-
 interface Post {
   id: number;
   title: string;
@@ -26,25 +24,16 @@ export default function HomeScreen() {
 
   return (
     <>
-      {/* Hero Banner */}
-      <div
-        className="w-full h-[400px] bg-cover bg-center"
-        style={{ backgroundImage: `url(${lightningImg})` }}
-      >
-        <div className="w-full h-full flex items-center justify-center">
-          <h1 className="text-6xl font-heading text-white drop-shadow-lg">
-            Welcome to Lightning Blog
-          </h1>
-        </div>
-      </div>
-
       {/* CTA Section */}
-      <div className="container mt-12 text-center">
-        <p className="text-xl text-neutral-700">
+      <div className="container mt-12 text-center text-neutral-100">
+        <h1 className="text-5xl font-extrabold mb-4">
+          Welcome to Lightning Blog
+        </h1>
+        <p className="text-xl mb-6">
           A modern multi-user blogging platform—log in or register to start
           writing!
         </p>
-        <div className="mt-6 flex justify-center gap-4">
+        <div className="flex justify-center gap-4">
           <LinkButton to="/posts" variant="primary">
             View Posts
           </LinkButton>
@@ -62,14 +51,14 @@ export default function HomeScreen() {
 
       {/* Latest Posts */}
       <div className="container mt-16">
-        <h2 className="text-3xl font-heading text-neutral-900 mb-8">
+        <h2 className="text-3xl font-heading text-neutral-100 mb-8">
           Latest Posts
         </h2>
         {isLoading ? (
-          <p className="text-center text-neutral-500">Loading posts…</p>
+          <p className="text-center text-neutral-400">Loading posts…</p>
         ) : error ? (
           <p className="text-center text-error">Failed to load posts</p>
-        ) : posts?.length ? (
+        ) : posts && posts.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {posts.map((p) => (
               <PostCard
@@ -84,7 +73,7 @@ export default function HomeScreen() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-neutral-500">No posts yet.</p>
+          <p className="text-center text-neutral-400">No posts yet.</p>
         )}
       </div>
     </>
