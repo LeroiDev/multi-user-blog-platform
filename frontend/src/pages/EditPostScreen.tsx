@@ -1,8 +1,8 @@
-// src/pages/EditPostScreen.tsx
-import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import FormField from "../components/CustomFormField";
+import { Button } from "../components/CustomButton";
 import { api } from "../api/client";
 
 interface Post {
@@ -15,14 +15,15 @@ export default function EditPostScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  // Fetch existing post
+
+  // Fetch the existing post
   const {
     data: post,
     isLoading,
     error,
   } = useQuery<Post>({
     queryKey: ["post", id],
-    queryFn: () => api.get<Post>(`/posts/${id}`).then((res) => res.data),
+    queryFn: () => api.get<Post>(`/posts/${id}`).then((r) => r.data),
     enabled: !!id,
   });
 
@@ -37,6 +38,7 @@ export default function EditPostScreen() {
       setContent(post.content);
     }
   }, [post]);
+
   // Mutation for updating
   const updateMutation = useMutation({
     mutationFn: () => api.put(`/posts/${id}`, { title, content }),
@@ -47,46 +49,54 @@ export default function EditPostScreen() {
     },
   });
 
-  const onSubmit = (e: FormEvent) => {
+  // Handle loading/error states
+  if (isLoading) {
+    return <p className="text-center">Loading…</p>;
+  }
+  if (error instanceof Error) {
+    return <p className="text-center text-red-500">Error: {error.message}</p>;
+  }
+  if (!post) {
+    return <p className="text-center">Post not found.</p>;
+  }
+
+  // Submit handler
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     updateMutation.mutate();
   };
 
-  if (isLoading) return <div>Loading…</div>;
-  if (error instanceof Error) return <div>Error: {error.message}</div>;
-  if (!post) return <div>Post not found.</div>;
-
   return (
-    <form onSubmit={onSubmit} className="p-4 max-w-2xl mx-auto space-y-4">
-      <h2 className="text-2xl font-bold">Edit Post</h2>
-
-      <div>
-        <label className="block mb-1 font-medium">Title</label>
-        <input
-          className="w-full border px-3 py-2 rounded"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Content</label>
-        <textarea
-          className="w-full border px-3 py-2 rounded h-40"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={updateMutation.isPending}
-        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-      >
-        {updateMutation.isPending ? "Saving…" : "Save Changes"}
-      </button>
-    </form>
+    <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-heading mb-6 text-neutral-900">Edit Post</h1>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <FormField label="Title" htmlFor="title">
+          <input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 border border-neutral-300 rounded"
+            required
+          />
+        </FormField>
+        <FormField label="Content" htmlFor="content">
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={8}
+            className="w-full p-2 border border-neutral-300 rounded"
+            required
+          />
+        </FormField>
+        <Button
+          type="submit"
+          disabled={updateMutation.isPending}
+          className="w-full"
+        >
+          {updateMutation.isPending ? "Saving…" : "Save Changes"}
+        </Button>
+      </form>
+    </div>
   );
 }

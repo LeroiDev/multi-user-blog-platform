@@ -7,7 +7,12 @@ interface FormFieldProps {
   children: ReactNode;
 }
 
-export default function FormField({ label, htmlFor, error, children }: FormFieldProps) {
+export default function FormField({
+  label,
+  htmlFor,
+  error,
+  children,
+}: FormFieldProps) {
   return (
     <div className="mb-4">
       <label htmlFor={htmlFor} className="block font-medium mb-1">
