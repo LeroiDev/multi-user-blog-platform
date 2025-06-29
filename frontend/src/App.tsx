@@ -1,27 +1,38 @@
-import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/LoginScreen";
-import RegisterScreen from "./pages/RegisterScreen";
+import Layout from "./components/Layout";
+
 import HomeScreen from "./pages/HomeScreen";
 import PostListScreen from "./pages/PostListScreen";
 import PostDetailScreen from "./pages/PostDetailScreen";
 import CreatePostScreen from "./pages/CreatePostScreen";
 import EditPostScreen from "./pages/EditPostScreen";
+import LoginScreen from "./pages/LoginScreen";
+import RegisterScreen from "./pages/RegisterScreen";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Landing page */}
-        <Route path="/" element={<HomeScreen />} />
-        {/* Posts listing, detail, create */}
-        <Route path="/posts" element={<PostListScreen />} />
-        <Route path="/posts/new" element={<CreatePostScreen />} />
-        <Route path="/posts/:id" element={<PostDetailScreen />} />
-        <Route path="/posts/:id/edit" element={<EditPostScreen />} />
-        {/* Authentication routes */}
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<RegisterScreen />} />
+        <Route path="/" element={<Layout />}>
+          {/* “index” renders at “/” */}
+          <Route index element={<HomeScreen />} />
+
+          {/* Posts list at “/posts” */}
+          <Route path="posts" element={<PostListScreen />} />
+
+          {/* Create new post */}
+          <Route path="posts/new" element={<CreatePostScreen />} />
+
+          {/* Post detail */}
+          <Route path="posts/:id" element={<PostDetailScreen />} />
+
+          {/* Edit post */}
+          <Route path="posts/:id/edit" element={<EditPostScreen />} />
+
+          {/* Authentication */}
+          <Route path="login" element={<LoginScreen />} />
+          <Route path="register" element={<RegisterScreen />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
