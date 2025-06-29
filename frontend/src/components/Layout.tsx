@@ -1,6 +1,7 @@
 import { useLocation, Outlet } from "react-router-dom";
 import { LinkButton } from "./CustomButton";
 import BackgroundVideo from "./BackgroundVideo";
+import { AnimatePresence, motion } from "framer-motion";
 
 import lightningPoster from "../assets/images/lightning_blog.jpg";
 import loginVidMp4 from "../assets/videos/loginVid.mp4";
@@ -59,9 +60,18 @@ export default function Layout() {
           </div>
         </header>
         {/* MAIN CONTENT */}
-        <main className="flex-grow container py-12">
-          <Outlet />
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={pathname}
+            className="flex-grow container py-12"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Outlet />
+          </motion.main>
+        </AnimatePresence>
         {/* FOOTER */}
         <footer className="bg-transparent text-center text-sm py-4">
           © {new Date().getFullYear()} Lightning Blog • All rights reserved
