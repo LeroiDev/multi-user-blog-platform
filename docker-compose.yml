@@ -1,13 +1,31 @@
+# docker-compose.yml
 version: "3.8"
+
 services:
   backend:
-    # will build FastAPI service here
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      - ./backend/app:/app/app        # for live-reload in dev
+      - ./backend/tests:/app/tests
     ports:
       - "8000:8000"
+    environment:
+      SECRET_KEY: your_secret_key_here
+      # DATABASE_URL: sqlite:///./blog.db
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
-    # will build React service here
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    volumes:
+      - ./frontend:/app               # for `npm run dev` live-reload
     ports:
-      - "3000:3000"
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: "http://backend:8000"
+    depends_on:
+      - backend
+    command: npm run dev              # swap to `serve -s dist` for prod
