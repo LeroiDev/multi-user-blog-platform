@@ -1,8 +1,15 @@
+# Runtime dependencies
 fastapi
 uvicorn[standard]
 sqlalchemy
 passlib[bcrypt]
-python-jose
+python-jose[cryptography]
+pydantic[email]
+email-validator
+python-multipart
+python-dotenv
+
+# Dev/test dependencies
 pytest
 pytest-asyncio
 httpx
