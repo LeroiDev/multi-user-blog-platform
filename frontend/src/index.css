@@ -54,6 +54,30 @@
   }
 }
 
+/* 4.2 Core element styling */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  /* Force dark text on all form controls */
+  color: var(--color-n900);
+}
+
+/* Placeholder text should be lighter */
+::-webkit-input-placeholder {
+  color: var(--color-n500);
+}
+:-ms-input-placeholder {
+  color: var(--color-n500);
+}
+::placeholder {
+  color: var(--color-n500);
+}
+
+
+
 /* 5 Container utility for centered content */
 .container {
   width: 100%;
@@ -71,4 +95,11 @@
 
 .video-wrapper video.ready {
   opacity: 1;
+}
+
+.text-success {
+  color: var(--color-success);
+}
+.text-error {
+  color: var(--color-error);
 }

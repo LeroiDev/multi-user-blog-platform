@@ -1,3 +1,4 @@
+// src/pages/RegisterScreen.tsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -29,13 +30,28 @@ export default function RegisterScreen() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(registerSchema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  // PASSWORD AND CONFIRM PASSWORD watch both fields:
+  const pwd = watch("password");
+  const confirmPwd = watch("confirmPassword");
+  const passwordsMatch = pwd && confirmPwd && pwd === confirmPwd;
+
+  // decide when to show the Zod error vs. live feedback
+  const showZodError = !confirmPwd || !errors.confirmPassword;
+  const zodErrorMsg = errors.confirmPassword?.message;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setServerError(undefined);
     try {
-      await api.post("/users/", { email: data.email, password: data.password });
+      await api.post("/users/", {
+        email: data.email,
+        password: data.password,
+      });
       navigate("/login", { replace: true });
     } catch (err) {
       const e = err as AxiosError<{ detail: string }>;
@@ -54,6 +70,7 @@ export default function RegisterScreen() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* First Name */}
         <FormField
           label="First Name"
           htmlFor="firstName"
@@ -62,10 +79,11 @@ export default function RegisterScreen() {
           <input
             id="firstName"
             {...register("firstName")}
-            className="w-full p-2 border border-neutral-300 rounded"
+            className="w-full p-2 border border-neutral-300 rounded text-neutral-900 placeholder-neutral-500"
           />
         </FormField>
 
+        {/* Last Name */}
         <FormField
           label="Last Name"
           htmlFor="lastName"
@@ -74,19 +92,21 @@ export default function RegisterScreen() {
           <input
             id="lastName"
             {...register("lastName")}
-            className="w-full p-2 border border-neutral-300 rounded"
+            className="w-full p-2 border border-neutral-300 rounded text-neutral-900 placeholder-neutral-500"
           />
         </FormField>
 
+        {/* Email */}
         <FormField label="Email" htmlFor="email" error={errors.email?.message}>
           <input
             id="email"
             type="email"
             {...register("email")}
-            className="w-full p-2 border border-neutral-300 rounded"
+            className="w-full p-2 border border-neutral-300 rounded text-neutral-900 placeholder-neutral-500"
           />
         </FormField>
 
+        {/* Password */}
         <FormField
           label="Password"
           htmlFor="password"
@@ -96,21 +116,37 @@ export default function RegisterScreen() {
             id="password"
             type="password"
             {...register("password")}
-            className="w-full p-2 border border-neutral-300 rounded"
+            className="w-full p-2 border border-neutral-300 rounded text-neutral-900 placeholder-neutral-500"
           />
         </FormField>
 
+        {/* Confirm Password + Live Match Indicator */}
         <FormField
           label="Confirm Password"
           htmlFor="confirmPassword"
-          error={errors.confirmPassword?.message}
+          // only display the Zod error if they haven't started typing yet
+          error={showZodError ? zodErrorMsg : undefined}
         >
           <input
             id="confirmPassword"
             type="password"
             {...register("confirmPassword")}
-            className="w-full p-2 border border-neutral-300 rounded"
+            className="w-full p-2 border border-neutral-300 rounded
+               text-neutral-900 placeholder-neutral-500"
           />
+
+          {/* once they type, replace the Zod error with live feedback */}
+          {confirmPwd && (
+            <p
+              className={`mt-1 text-sm ${
+                passwordsMatch ? "text-success" : "text-error"
+              }`}
+            >
+              {passwordsMatch
+                ? "✅ Passwords match"
+                : "❌ Passwords do not match"}
+            </p>
+          )}
         </FormField>
 
         <Button type="submit" disabled={isSubmitting} className="w-full">

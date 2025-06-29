@@ -14,12 +14,15 @@ export default function FormField({
   children,
 }: FormFieldProps) {
   return (
-    <div className="mb-4">
-      <label htmlFor={htmlFor} className="block font-medium mb-1">
+    <div>
+      <label
+        htmlFor={htmlFor}
+        className="block mb-1 font-medium text-neutral-900"
+      >
         {label}
       </label>
       {children}
-      {error && <p className="text-red-600 mt-1">{error}</p>}
+      {error && <p className="mt-1 text-sm text-error">{error}</p>}
     </div>
   );
 }
