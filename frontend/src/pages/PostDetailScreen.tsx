@@ -1,9 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "../components/Sidebar";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 import { api } from "../api/client";
 import { useAuthStore } from "../stores/authStore";
 import { LinkButton, Button } from "../components/CustomButton";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface Post {
   id: number;
@@ -28,15 +31,21 @@ export default function PostDetailScreen() {
     error,
   } = useQuery<Post>({
     queryKey: ["post", id],
-    queryFn: () => api.get(`/posts/${id}`).then(r => r.data),
+    queryFn: () => api.get(`/posts/${id}`).then((r) => r.data),
     enabled: !!id,
   });
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: () => api.delete(`/posts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      navigate("/");
+      toast.success("Post deleted successfully");
+      navigate("/posts", { replace: true });
+    },
+    onError: () => {
+      toast.error("Failed to delete post");
     },
   });
 
@@ -53,50 +62,57 @@ export default function PostDetailScreen() {
   }
 
   const isOwner = Boolean(token && currentUser?.id === post.owner_id);
-  console.log(`Post owner ID: ${post.owner_id}, Current user ID: ${currentUser?.id}`);  
 
   return (
-    <div className="flex gap-8">
-      {/* Main content */}
-      <article className="flex-grow bg-white rounded-lg shadow-lg overflow-hidden">
-        {post.thumbnail_url && (
-          <img
-            src={post.thumbnail_url}
-            alt={post.title}
-            className="w-full h-64 object-cover"
-          />
-        )}
-        <div className="p-6">
-          <h1 className="font-heading text-3xl mb-4">{post.title}</h1>
-          <p className="text-sm text-neutral-500 mb-6">
-            By {post.author_email} on{" "}
-            {new Date(post.publication_date).toLocaleDateString()}
-          </p>
-          <div className="prose prose-lg max-w-none text-neutral-800 mb-6 whitespace-pre-wrap">
-            {post.content}
-          </div>
-          {isOwner && (
-            <div className="flex space-x-4">
-              <LinkButton to={`/posts/${id}/edit`} variant="secondary">
-                Edit
-              </LinkButton>
-              <Button
-                onClick={() => {
-                  if (confirm("Delete this post?")) {
-                    deleteMutation.mutate();
-                  }
-                }}
-                variant="error"
-              >
-                Delete
-              </Button>
-            </div>
+    <>
+      <div className="flex gap-8">
+        {/* Main content */}
+        <article className="flex-grow bg-white rounded-lg shadow-lg overflow-hidden">
+          {post.thumbnail_url && (
+            <img
+              src={post.thumbnail_url}
+              alt={post.title}
+              className="w-full h-64 object-cover"
+            />
           )}
-        </div>
-      </article>
+          <div className="p-6">
+            <h1 className="font-heading text-3xl mb-4">{post.title}</h1>
+            <p className="text-sm text-neutral-500 mb-6">
+              By {post.author_email} on{" "}
+              {new Date(post.publication_date).toLocaleDateString()}
+            </p>
+            <div className="prose prose-lg max-w-none text-neutral-800 mb-6 whitespace-pre-wrap">
+              {post.content}
+            </div>
+            {isOwner && (
+              <div className="flex space-x-4">
+                <LinkButton to={`/posts/${id}/edit`} variant="secondary">
+                  Edit
+                </LinkButton>
+                <Button onClick={() => setShowConfirm(true)} variant="error">
+                  Delete
+                </Button>
+              </div>
+            )}
+          </div>
+        </article>
 
-      {/* Sidebar */}
-      <Sidebar authorEmail={post.author_email} />
-    </div>
+        {/* Sidebar */}
+        <Sidebar authorEmail={post.author_email} />
+      </div>
+      {/* Confirmation Modal */}
+      <ConfirmationDialog
+        open={showConfirm}
+        title="Delete this post?"
+        description="Once deleted, you can’t recover this post."
+        confirmText="Yes, delete"
+        cancelText="Cancel"
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={() => {
+          setShowConfirm(false);
+          deleteMutation.mutate();
+        }}
+      />
+    </>
   );
 }

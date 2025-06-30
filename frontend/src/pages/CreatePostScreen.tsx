@@ -1,15 +1,15 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import FormField from "../components/CustomFormField";
-import { Button } from "../components/CustomButton";
+import { Button, LinkButton } from "../components/CustomButton";
 import { api } from "../api/client";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface PostCreatePayload {
   title: string;
   content: string;
 }
-
 interface PostResponse {
   id: number;
   title: string;
@@ -30,7 +30,8 @@ export default function CreatePostScreen() {
 
     const payload: PostCreatePayload = { title, content };
     try {
-      const response = await api.post<PostResponse>("/posts", payload);
+      const response = await api.post<PostResponse>("/posts/", payload);
+      toast.success("Post created successfully");
       navigate(`/posts/${response.data.id}`);
     } catch (err: unknown) {
       let message = "Failed to create post";
@@ -38,7 +39,7 @@ export default function CreatePostScreen() {
         const detail = (err.response?.data as { detail?: string })?.detail;
         message = detail ?? message;
       }
-      alert(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -73,9 +74,21 @@ export default function CreatePostScreen() {
             required
           />
         </FormField>
-        <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? "Creating…" : "Create Post"}
-        </Button>
+
+        {/* Button row: Create + Cancel */}
+        <div className="flex justify-center items-center space-x-4 mt-6">
+          <Button
+            type="submit"
+            disabled={submitting}
+            variant="primary"
+            className="px-6"
+          >
+            {submitting ? "Creating…" : "Create Post"}
+          </Button>
+          <LinkButton to="/posts" variant="secondary" className="px-6">
+            Cancel
+          </LinkButton>
+        </div>
       </form>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import FormField from "../components/CustomFormField";
-import { Button } from "../components/CustomButton";
+import { Button, LinkButton } from "../components/CustomButton";
 import { api } from "../api/client";
 
 interface Post {
@@ -89,13 +89,26 @@ export default function EditPostScreen() {
             required
           />
         </FormField>
-        <Button
-          type="submit"
-          disabled={updateMutation.isPending}
-          className="w-full"
-        >
-          {updateMutation.isPending ? "Saving…" : "Save Changes"}
-        </Button>
+        <div className="flex justify-center items-center space-x-4 mt-6">
+          {/* Primary “Save” button */}
+          <Button
+            type="submit"
+            disabled={updateMutation.isPending}
+            variant="primary"
+            className="px-6 cursor-pointer"
+          >
+            {updateMutation.isPending ? "Saving…" : "Save Changes"}
+          </Button>
+
+          {/* Secondary “Cancel” link */}
+          <LinkButton
+            to={`/posts/${id}`}
+            variant="secondary"
+            className="px-6 cursor-pointer"
+          >
+            Cancel
+          </LinkButton>
+        </div>
       </form>
     </div>
   );

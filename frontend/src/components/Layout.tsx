@@ -27,21 +27,21 @@ export default function Layout() {
     videoMp4 = loginVidMp4;
   }
 
-  console.log("Current path:", pathname, "→ playing:", videoMp4);
-
   return (
     <BackgroundVideo srcMp4={videoMp4} poster={lightningPoster}>
       <div className="min-h-screen flex flex-col bg-transparent text-neutral-100">
         {/* HEADER */}
         <header className="sticky top-0 z-20 bg-transparent">
           <div className="container flex justify-between items-center py-4">
-            <LinkButton
-              to="/"
-              variant="primary"
-              className="text-2xl font-heading"
-            >
-              Horizon Haven
-            </LinkButton>
+            
+      {pathname === "/" ? (
+               <h1 className="text-2xl font-heading text-white">Horizon Haven Blog</h1>
+            ) : (
+              <LinkButton to="/" variant="primary" className="text-2xl font-heading">
+                Back to Home
+              </LinkButton>
+            )}
+
             <nav className="flex items-center space-x-4">
               {!isLoggedIn ? (
                 <>
