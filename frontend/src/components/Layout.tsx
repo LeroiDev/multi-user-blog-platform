@@ -8,6 +8,7 @@ import lightningPoster from "../assets/images/lightning_blog.jpg";
 import loginVidMp4 from "../assets/videos/loginVid.mp4";
 import postsVidMp4 from "../assets/videos/postsVid.mp4";
 import detailVidMp4 from "../assets/videos/detailVid.mp4";
+import toast from "react-hot-toast";
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -54,6 +55,7 @@ export default function Layout() {
                     variant="secondary"
                     onClick={() => {
                       logout();
+                       toast.success("You’ve been logged out");
                       // After logout, redirect to login
                       window.location.href = "/login";
                     }}

@@ -1,11 +1,11 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "../components/Sidebar";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import { LinkButton, Button } from "../components/CustomButton";
 import { api } from "../api/client";
 import { useAuthStore } from "../stores/authStore";
-import { LinkButton, Button } from "../components/CustomButton";
-import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface Post {
@@ -25,6 +25,7 @@ export default function PostDetailScreen() {
   const token = useAuthStore((s) => s.token);
   const currentUser = useAuthStore((s) => s.user);
 
+  // 1) Fetch the post
   const {
     data: post,
     isLoading,
@@ -35,13 +36,15 @@ export default function PostDetailScreen() {
     enabled: !!id,
   });
 
+  // 2) Delete confirmation dialog state
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // 3) Delete mutation
   const deleteMutation = useMutation({
     mutationFn: () => api.delete(`/posts/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       navigate("/posts", { replace: true });
     },
     onError: () => {
@@ -49,24 +52,49 @@ export default function PostDetailScreen() {
     },
   });
 
+  // 1) Loading skeleton
   if (isLoading) {
-    return <p className="text-center">Loading post…</p>;
+    return (
+      <div className="max-w-4xl mx-auto space-y-4 animate-pulse">
+        <div className="h-8 bg-neutral-300 rounded w-1/2 mx-auto" />
+        <div className="h-6 bg-neutral-300 rounded w-1/3 mx-auto" />
+        <div className="h-64 bg-neutral-300 rounded" />
+        <div className="space-y-2">
+          <div className="h-4 bg-neutral-300 rounded" />
+          <div className="h-4 bg-neutral-300 rounded w-5/6" />
+          <div className="h-4 bg-neutral-300 rounded w-2/3" />
+        </div>
+      </div>
+    );
   }
 
+  // 2) Error state
   if (error instanceof Error) {
-    return <p className="text-center text-red-500">Error: {error.message}</p>;
+    return <p className="text-center text-red-500">{error.message}</p>;
   }
 
+  // 3) Not found state
   if (!post) {
-    return <p className="text-center">Post not found.</p>;
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center bg-neutral-100 p-6 rounded-lg shadow-lg max-w-md mx-auto">
+        <h2 className="text-3xl font-heading mb-4">Post not found</h2>
+        <p className="mb-6 text-neutral-700">
+          We couldn’t find the post you were looking for.
+        </p>
+        <LinkButton to="/posts" variant="primary">
+          Back to Posts
+        </LinkButton>
+      </div>
+    );
   }
 
+  // 4) Main render
   const isOwner = Boolean(token && currentUser?.id === post.owner_id);
 
   return (
     <>
       <div className="flex gap-8">
-        {/* Main content */}
+        {/* Main content column */}
         <article className="flex-grow bg-white rounded-lg shadow-lg overflow-hidden">
           {post.thumbnail_url && (
             <img
@@ -100,6 +128,7 @@ export default function PostDetailScreen() {
         {/* Sidebar */}
         <Sidebar authorEmail={post.author_email} />
       </div>
+
       {/* Confirmation Modal */}
       <ConfirmationDialog
         open={showConfirm}

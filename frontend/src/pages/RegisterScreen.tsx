@@ -8,6 +8,7 @@ import FormField from "../components/CustomFormField";
 import { Button } from "../components/CustomButton";
 import { api } from "../api/client";
 import type { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 const registerSchema = z
   .object({
@@ -52,10 +53,13 @@ export default function RegisterScreen() {
         email: data.email,
         password: data.password,
       });
+      toast.success("Account created successfully! Please log in.");
       navigate("/login", { replace: true });
     } catch (err) {
       const e = err as AxiosError<{ detail: string }>;
       setServerError(e.response?.data.detail ?? "Registration failed");
+      toast.error("Registration failed. Please try again.");
+      navigate("/", { replace: true });
     }
   };
 
