@@ -1,8 +1,10 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+
 import FormField from "../components/CustomFormField";
-import { Button } from "../components/CustomButton";
+import { Button, LinkButton } from "../components/CustomButton";
 import { api } from "../api/client";
 
 interface Post {
@@ -16,22 +18,22 @@ export default function EditPostScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Fetch the existing post
+  // 1. Fetch the existing post
   const {
     data: post,
-    isLoading,
-    error,
+    isLoading: postLoading,
+    error: postError,
   } = useQuery<Post>({
     queryKey: ["post", id],
     queryFn: () => api.get<Post>(`/posts/${id}`).then((r) => r.data),
-    enabled: !!id,
+    enabled: Boolean(id),
   });
 
-  // Local form state
+  // 2. Local form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  // Pre-fill when post loads
+  // 3. Pre-fill when post loads
   useEffect(() => {
     if (post) {
       setTitle(post.title);
@@ -39,28 +41,32 @@ export default function EditPostScreen() {
     }
   }, [post]);
 
-  // Mutation for updating
+  // 4. Mutation for updating
   const updateMutation = useMutation({
     mutationFn: () => api.put(`/posts/${id}`, { title, content }),
     onSuccess: () => {
+      toast.success("Post updated successfully");
       queryClient.invalidateQueries({ queryKey: ["post", id] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       navigate(`/posts/${id}`);
     },
+    onError: () => {
+      toast.error("Failed to save changes");
+    },
   });
 
-  // Handle loading/error states
-  if (isLoading) {
+  // 5. Loading / error / not found states
+  if (postLoading) {
     return <p className="text-center">Loading…</p>;
   }
-  if (error instanceof Error) {
-    return <p className="text-center text-red-500">Error: {error.message}</p>;
+  if (postError instanceof Error) {
+    return <p className="text-center text-red-500">Error: {postError.message}</p>;
   }
   if (!post) {
     return <p className="text-center">Post not found.</p>;
   }
 
-  // Submit handler
+  // 6. Handle form submit
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     updateMutation.mutate();
@@ -79,6 +85,7 @@ export default function EditPostScreen() {
             required
           />
         </FormField>
+
         <FormField label="Content" htmlFor="content">
           <textarea
             id="content"
@@ -89,13 +96,27 @@ export default function EditPostScreen() {
             required
           />
         </FormField>
-        <Button
-          type="submit"
-          disabled={updateMutation.isPending}
-          className="w-full"
-        >
-          {updateMutation.isPending ? "Saving…" : "Save Changes"}
-        </Button>
+
+        <div className="flex justify-center items-center space-x-4 mt-6">
+          {/* Primary “Save Changes” button */}
+          <Button
+            type="submit"
+            disabled={updateMutation.isPending}
+            variant="primary"
+            className="px-6"
+          >
+            {updateMutation.isPending ? "Saving…" : "Save Changes"}
+          </Button>
+
+          {/* Secondary “Cancel” link */}
+          <LinkButton
+            to={`/posts/${id}`}
+            variant="secondary"
+            className="px-6"
+          >
+            Cancel
+          </LinkButton>
+        </div>
       </form>
     </div>
   );

@@ -6,8 +6,10 @@ import classNames from "classnames";
 // Base styles for both Button and LinkButton
 const base =
   "inline-flex items-center justify-center px-5 py-3 rounded-lg font-medium \
-    transform transition duration-200 ease-in-out \
-    focus:outline-none focus:ring-2 focus:ring-offset-2";
+    transform transition duration-200 ease-in-out focus:outline-none \
+    focus:ring-2 focus:ring-offset-2 no-underline";
+
+const baseWithCursor = `${base} cursor-pointer`;
 
 // Extendable variants
 const variants = {
@@ -30,7 +32,7 @@ export function Button({
   return (
     <button
       className={classNames(
-        base,
+        baseWithCursor,
         variants[variant],
         "hover:scale-105 active:scale-95",
         className
@@ -53,7 +55,7 @@ export function LinkButton({
   return (
     <Link
       className={classNames(
-        base,
+        baseWithCursor,
         variants[variant],
         "hover:scale-105 active:scale-95",
         className

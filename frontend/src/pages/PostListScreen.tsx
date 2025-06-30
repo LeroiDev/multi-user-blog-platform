@@ -1,7 +1,7 @@
-// src/pages/PostListScreen.tsx
+import PostCard from "../components/PostCard";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
-import PostCard from "../components/PostCard";
+import { LinkButton } from "../components/CustomButton";
 
 interface Post {
   id: number;
@@ -12,9 +12,13 @@ interface Post {
 }
 
 export default function PostListScreen() {
-  const { data: posts, isLoading, error } = useQuery<Post[]>({
+  const {
+    data: posts,
+    isLoading,
+    error,
+  } = useQuery<Post[]>({
     queryKey: ["posts"],
-    queryFn: () => api.get("/posts").then((res) => res.data),
+    queryFn: () => api.get("/posts/").then((r) => r.data),
   });
 
   return (
@@ -22,7 +26,12 @@ export default function PostListScreen() {
       <h2 className="text-3xl font-heading mb-6">All Posts</h2>
 
       {isLoading ? (
-        <p className="text-center text-neutral-500">Loading posts…</p>
+        // Skeleton grid
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-48 bg-neutral-300 rounded-lg" />
+          ))}
+        </div>
       ) : error instanceof Error ? (
         <p className="text-center text-error">Error: {error.message}</p>
       ) : posts && posts.length > 0 ? (
@@ -39,7 +48,13 @@ export default function PostListScreen() {
           ))}
         </div>
       ) : (
-        <p className="text-center text-neutral-500">No posts yet.</p>
+        // Empty state card
+        <div className="p-8 bg-neutral-100 rounded-lg shadow-lg text-center">
+          <p className="mb-4 text-neutral-700">There aren’t any posts yet.</p>
+          <LinkButton to="/posts/new" variant="secondary">
+            Be the first to write one
+          </LinkButton>
+        </div>
       )}
     </div>
   );

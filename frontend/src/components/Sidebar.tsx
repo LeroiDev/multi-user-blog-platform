@@ -13,7 +13,7 @@ export default function Sidebar({ authorEmail }: { authorEmail: string }) {
     queryKey: ["authorPosts", authorEmail],
     queryFn: () =>
       api
-        .get(`/posts?author=${encodeURIComponent(authorEmail)}&limit=5`)
+        .get(`/posts/?author=${encodeURIComponent(authorEmail)}&limit=5`)
         .then((res) => res.data),
   });
 

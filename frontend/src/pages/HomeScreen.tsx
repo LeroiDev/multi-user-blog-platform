@@ -2,6 +2,7 @@ import { LinkButton } from "../components/CustomButton";
 import PostCard from "../components/PostCard";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
+import { useAuthStore } from "../stores/authStore";
 
 interface Post {
   id: number;
@@ -19,34 +20,45 @@ export default function HomeScreen() {
     error,
   } = useQuery<Post[]>({
     queryKey: ["posts", { limit: 3 }],
-    queryFn: () => api.get("/posts?limit=3").then((r) => r.data),
+    queryFn: () => api.get("/posts/?limit=3").then((r) => r.data),
   });
+
+  const token = useAuthStore((s) => s.token);
+  const isLoggedIn = Boolean(token);
 
   return (
     <>
       {/* CTA Section */}
       <div className="container mt-12 text-center text-neutral-100">
-        <h1 className="text-5xl font-extrabold mb-4">
-          Welcome to Lightning Blog
-        </h1>
-        <p className="text-xl mb-6">
-          A modern multi-user blogging platform—log in or register to start
-          writing!
-        </p>
-        <div className="flex justify-center gap-4">
-          <LinkButton to="/posts" variant="primary">
-            View Posts
-          </LinkButton>
-          <LinkButton to="/posts/new" variant="secondary">
-            New Post
-          </LinkButton>
-          <LinkButton to="/login" variant="primary">
-            Login
-          </LinkButton>
-          <LinkButton to="/register" variant="secondary">
-            Register
-          </LinkButton>
-        </div>
+        <h1 className="text-5xl font-extrabold mb-4">Horizon Haven Blog</h1>
+
+        {!isLoggedIn ? (
+          <>
+            <p className="text-xl mb-6">
+              Welcome! Explore inspiring stories or register to start sharing
+              your own.
+            </p>
+            <div className="flex justify-center gap-4">
+              <LinkButton to="/posts" variant="secondary">
+                View Posts
+              </LinkButton>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-xl mb-6">
+              Welcome back! Ready to write your next great post?
+            </p>
+            <div className="flex justify-center gap-4">
+              <LinkButton to="/posts" variant="secondary">
+                View Posts
+              </LinkButton>
+              <LinkButton to="/posts/new" variant="primary">
+                New Post
+              </LinkButton>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Latest Posts */}

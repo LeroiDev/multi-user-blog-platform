@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
+import { Toaster } from "react-hot-toast";
 
+import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import HomeScreen from "./pages/HomeScreen";
 import PostListScreen from "./pages/PostListScreen";
 import PostDetailScreen from "./pages/PostDetailScreen";
@@ -8,33 +11,59 @@ import CreatePostScreen from "./pages/CreatePostScreen";
 import EditPostScreen from "./pages/EditPostScreen";
 import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
+import NotFound from "./pages/NotFound";
+
+import { useAuthStore } from "./stores/authStore";
 
 function App() {
+  // Session Persistence: rehydrate token into store on startup
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      useAuthStore.getState().setToken(token);
+    }
+  }, []);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {/* “index” renders at “/” */}
-          <Route index element={<HomeScreen />} />
+    <>
+      {/* Global toast container */}
+      <Toaster position="top-right" />
 
-          {/* Posts list at “/posts” */}
-          <Route path="posts" element={<PostListScreen />} />
+      <BrowserRouter>
+        <Routes>
+          {/* All routes wrapped in the main Layout */}
+          <Route path="/" element={<Layout />}>
+            {/* Public */}
+            <Route index element={<HomeScreen />} />
+            <Route path="login" element={<LoginScreen />} />
+            <Route path="register" element={<RegisterScreen />} />
+            <Route path="posts" element={<PostListScreen />} />
+            <Route path="posts/:id" element={<PostDetailScreen />} />
 
-          {/* Create new post */}
-          <Route path="posts/new" element={<CreatePostScreen />} />
+            {/* Protected: only authenticated users */}
+            <Route
+              path="posts/new"
+              element={
+                <ProtectedRoute>
+                  <CreatePostScreen />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="posts/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <EditPostScreen />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-          {/* Post detail */}
-          <Route path="posts/:id" element={<PostDetailScreen />} />
-
-          {/* Edit post */}
-          <Route path="posts/:id/edit" element={<EditPostScreen />} />
-
-          {/* Authentication */}
-          <Route path="login" element={<LoginScreen />} />
-          <Route path="register" element={<RegisterScreen />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          {/* Fallback for any other URL */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

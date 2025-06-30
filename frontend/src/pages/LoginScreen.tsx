@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,9 +8,10 @@ import { Button } from "../components/CustomButton";
 import { api } from "../api/client";
 import { useAuthStore } from "../stores/authStore";
 import type { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 const loginSchema = z.object({
-  email: z.string().email("Must be valid"),
+  email: z.string().email("Must be a valid email"),
   password: z.string().min(6, "At least 6 characters"),
 });
 
@@ -18,7 +19,12 @@ type LoginData = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
   const setToken = useAuthStore((s) => s.setToken);
+
+  // Grab the `from` path (if any) so we can redirect back there after login
+  const from = (location.state as { from?: string })?.from || "/";
+
   const [serverError, setServerError] = useState<string>();
   const {
     register,
@@ -37,10 +43,13 @@ export default function LoginScreen() {
         })
       );
       setToken(res.data.access_token);
-      navigate("/", { replace: true });
+      toast.success("Logged in successfully!");
+      navigate(from, { replace: true });
     } catch (err) {
       const e = err as AxiosError<{ detail: string }>;
-      setServerError(e.response?.data.detail ?? "Login failed");
+      const msg = e.response?.data.detail ?? "Login failed";
+      setServerError(msg);
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 

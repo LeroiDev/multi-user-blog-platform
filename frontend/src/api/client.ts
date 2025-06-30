@@ -5,6 +5,7 @@ export const api = axios.create({
   baseURL: "http://localhost:8000",
 });
 
+// Attach JWT from store’s static helper
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token && config.headers) {
