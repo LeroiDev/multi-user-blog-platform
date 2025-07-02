@@ -1,18 +1,34 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# SQLite URL; the file will be created in the repo root
-SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db"
+# Load .env (if added later)
+load_dotenv()
 
-# connect_args required for SQLite + multithreading
+# Read DATABASE_URL from the environment, fall back to SQLite
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./blog.db"
+)
+
+# For SQLite only, enable check_same_thread
+connect_args = {}
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    connect_args["check_same_thread"] = False
+
+# Create the engine
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL,
+    **({"connect_args": connect_args} if connect_args else {})
 )
 
-# SessionLocal class will be our session factory
+# Session factory
 SessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine
+    autocommit=False,
+    autoflush=False,
+    bind=engine
 )
 
-# Base class for our ORM models
+# Base class for models
 Base = declarative_base()
