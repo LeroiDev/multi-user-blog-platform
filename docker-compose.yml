@@ -1,32 +1,4 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    volumes:
-      - ./backend/app:/app/app        
-      - ./backend/tests:/app/tests
-      - ./backend/migrations:/app/migrations
-      - ./backend/alembic.ini:/app/alembic.ini
-    ports:
-      - "8000:8000"
-    environment:
-      SECRET_KEY: your_secret_key_here
-      DATABASE_URL: postgresql://blog_user:blog_password@db:5432/blog_db
-    depends_on:
-      - db
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
-    environment:
-      VITE_API_BASE_URL: "http://localhost:8000"
-    command: serve -s dist -l 5173
-
   db:
     image: postgres:15-alpine
     restart: always
@@ -36,6 +8,39 @@ services:
       POSTGRES_DB: blog_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      # SQLAlchemy/PSQL connection URL
+      DATABASE_URL: postgresql://blog_user:blog_password@db:5432/blog_db
+      # JWT config
+      SECRET_KEY: your_very_secure_secret_here
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/migrations:/app/migrations
+      - ./backend/alembic.ini:/app/alembic.ini
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: "http://backend:8000"
+    command: serve -s dist -l 5173
 
 volumes:
   postgres_data:

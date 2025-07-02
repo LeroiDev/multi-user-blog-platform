@@ -1,9 +1,16 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from .database import engine, Base
 from .auth.routes import router as auth_router
 from .routes.posts import router as posts_router
 from fastapi.middleware.cors import CORSMiddleware
+
+if os.getenv("DOCKER") == "true":
+    load_dotenv(".env.docker")
+else:
+    load_dotenv(".env.local")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
