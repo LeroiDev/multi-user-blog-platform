@@ -19,9 +19,10 @@ if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
 
 # Create the engine
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    **({"connect_args": connect_args} if connect_args else {})
-)
+     SQLALCHEMY_DATABASE_URL,
+     echo=True,   # <— enable SQL logging
+     **({"connect_args": connect_args} if connect_args else {})
+ )
 
 # Session factory
 SessionLocal = sessionmaker(
