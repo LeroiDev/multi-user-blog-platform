@@ -4,23 +4,36 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     volumes:
-      - ./backend/app:/app/app        # for live-reload in dev
+      - ./backend/app:/app/app        
       - ./backend/tests:/app/tests
     ports:
       - "8000:8000"
     environment:
       SECRET_KEY: your_secret_key_here
-      # DATABASE_URL: sqlite:///./blog.db
+      DATABASE_URL: postgresql://blog_user:blog_password@db:5432/blog_db
+    depends_on:
+      - db
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    # volumes:   ← remove this binding!
-    #  - ./frontend:/app
     ports:
       - "5173:5173"
     environment:
       VITE_API_BASE_URL: "http://localhost:8000"
-    command: serve -s dist -l 5173       # swap to `serve -s dist` for prod
+    command: serve -s dist -l 5173
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: blog_user
+      POSTGRES_PASSWORD: blog_password
+      POSTGRES_DB: blog_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
